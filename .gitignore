@@ -1,0 +1,7 @@
+Week-04-Web-Scraping/book_scraper/raw_images/
+Week-04-Web-Scraping/book_scraper/cleaned_images/
+Week-04-Web-Scraping/book_scraper/raw_data/
+Week-04-Web-Scraping/book_scraper/cleaned_data/
+
+__pycache__/
+.ipynb_checkpoints/
