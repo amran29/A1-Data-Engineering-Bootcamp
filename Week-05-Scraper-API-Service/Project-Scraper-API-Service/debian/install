@@ -1,0 +1,6 @@
+app opt/scraper-api-service/
+scripts opt/scraper-api-service/
+main.py opt/scraper-api-service/
+requirements.txt opt/scraper-api-service/
+README.md opt/scraper-api-service/
+systemd/scraper-api.service lib/systemd/system/

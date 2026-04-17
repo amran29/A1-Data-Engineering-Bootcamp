@@ -1,0 +1,1407 @@
+amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service$ cd /mnt/c/Data\ enginering/A1-Data-Engineering-Bootcamp/Week-05
+mkdir -p Project-Scraper-API-Service
+cd Project-Scraper-API-Service
+pwd
+-bash: cd: /mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05: No such file or directory
+/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service
+amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ mkdir -p app scripts data systemd debian docs tests
+touch main.py requirements.txt README.md .gitignore
+touch app/__init__.py
+touch app/config.py app/database.py app/models.py app/schemas.py app/scraper.py app/cleaner.py app/crud.py app/api.py
+touch scripts/init_db.py scripts/run_scraper.py
+amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ find . -maxdepth 2 | sort
+.
+./.gitignore
+./README.md
+./app
+./app/__init__.py
+./app/api.py
+./app/cleaner.py
+./app/config.py
+./app/crud.py
+./app/database.py
+./app/models.py
+./app/schemas.py
+./app/scraper.py
+./data
+./debian
+./docs
+./main.py
+./requirements.txt
+./scripts
+./scripts/init_db.py
+./scripts/run_scraper.py
+./systemd
+./tests
+amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ cat > requirements.txt << 'EOF'
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+requests==2.32.3
+beautifulsoup4==4.12.3
+sqlalchemy==2.0.35
+psycopg2-binary==2.9.9
+pydantic==2.9.2
+python-dotenv==1.0.1
+EOF
+amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ cat > .gitignore << 'EOF'
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Environment files
+.env
+
+# Database / local data
+*.db
+data/*.json
+data/*.csv
+data/*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build artifacts
+build/
+dist/
+EOFuildinfockage output
+amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ cat > README.md << 'EOF'
+# Scraper API Service
+
+A complete data engineering mini-project that starts with a web scraping script and ends with a deployable Ubuntu service.
+
+## Project Idea
+
+This project scrapes product data from an e-commerce test website, cleans and structures the data, stores it in PostgreSQL, and exposes it through FastAPI endpoints.
+
+The final application is designed to run as a background service on Ubuntu using systemd, with firewall configuration and Debian packaging support.
+
+## Main Features
+
+- Scrape product data from a public website
+- Clean and normalize the scraped data
+- Store data in PostgreSQL
+- Expose the data through FastAPI endpoints
+- Run as a Linux service using systemd
+- Prepare the project for packaging as a `.deb` package
+
+## Tech Stack
+
+- Python
+- BeautifulSoup
+- Requests
+- PostgreSQL
+- SQLAlchemy
+- FastAPI
+- Uvicorn
+- systemd
+- UFW
+- Debian packaging
+
+.gitignorets.txtture
+>
+> ^C
+amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ pwd
+/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service
+amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ python3 -m venv .venv
+amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ source .venv/bin/activate
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ python -m pip install --upgrade pip
+Requirement already satisfied: pip in ./.venv/lib/python3.12/site-packages (24.0)
+Collecting pip
+  Downloading pip-26.0.1-py3-none-any.whl.metadata (4.7 kB)
+Downloading pip-26.0.1-py3-none-any.whl (1.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 1.1 MB/s eta 0:00:00
+Installing collected packages: pip
+  Attempting uninstall: pip
+    Found existing installation: pip 24.0
+    Uninstalling pip-24.0:
+      Successfully uninstalled pip-24.0
+Successfully installed pip-26.0.1
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ pip install -r requirements.txt
+Collecting fastapi==0.115.0 (from -r requirements.txt (line 1))
+  Downloading fastapi-0.115.0-py3-none-any.whl.metadata (27 kB)
+Collecting uvicorn==0.30.6 (from uvicorn[standard]==0.30.6->-r requirements.txt (line 2))
+  Downloading uvicorn-0.30.6-py3-none-any.whl.metadata (6.6 kB)
+Collecting requests==2.32.3 (from -r requirements.txt (line 3))
+  Downloading requests-2.32.3-py3-none-any.whl.metadata (4.6 kB)
+Collecting beautifulsoup4==4.12.3 (from -r requirements.txt (line 4))
+  Downloading beautifulsoup4-4.12.3-py3-none-any.whl.metadata (3.8 kB)
+Collecting sqlalchemy==2.0.35 (from -r requirements.txt (line 5))
+  Downloading SQLAlchemy-2.0.35-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.6 kB)
+Collecting psycopg2-binary==2.9.9 (from -r requirements.txt (line 6))
+  Downloading psycopg2_binary-2.9.9-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.4 kB)
+Collecting pydantic==2.9.2 (from -r requirements.txt (line 7))
+  Downloading pydantic-2.9.2-py3-none-any.whl.metadata (149 kB)
+Collecting python-dotenv==1.0.1 (from -r requirements.txt (line 8))
+  Downloading python_dotenv-1.0.1-py3-none-any.whl.metadata (23 kB)
+Collecting starlette<0.39.0,>=0.37.2 (from fastapi==0.115.0->-r requirements.txt (line 1))
+  Downloading starlette-0.38.6-py3-none-any.whl.metadata (6.0 kB)
+Collecting typing-extensions>=4.8.0 (from fastapi==0.115.0->-r requirements.txt (line 1))
+  Downloading typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting annotated-types>=0.6.0 (from pydantic==2.9.2->-r requirements.txt (line 7))
+  Downloading annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
+Collecting pydantic-core==2.23.4 (from pydantic==2.9.2->-r requirements.txt (line 7))
+  Downloading pydantic_core-2.23.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)
+Collecting click>=7.0 (from uvicorn==0.30.6->uvicorn[standard]==0.30.6->-r requirements.txt (line 2))
+  Downloading click-8.3.2-py3-none-any.whl.metadata (2.6 kB)
+Collecting h11>=0.8 (from uvicorn==0.30.6->uvicorn[standard]==0.30.6->-r requirements.txt (line 2))
+  Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+Collecting charset-normalizer<4,>=2 (from requests==2.32.3->-r requirements.txt (line 3))
+  Downloading charset_normalizer-3.4.7-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+Collecting idna<4,>=2.5 (from requests==2.32.3->-r requirements.txt (line 3))
+  Downloading idna-3.11-py3-none-any.whl.metadata (8.4 kB)
+Collecting urllib3<3,>=1.21.1 (from requests==2.32.3->-r requirements.txt (line 3))
+  Downloading urllib3-2.6.3-py3-none-any.whl.metadata (6.9 kB)
+Collecting certifi>=2017.4.17 (from requests==2.32.3->-r requirements.txt (line 3))
+  Downloading certifi-2026.2.25-py3-none-any.whl.metadata (2.5 kB)
+Collecting soupsieve>1.2 (from beautifulsoup4==4.12.3->-r requirements.txt (line 4))
+  Downloading soupsieve-2.8.3-py3-none-any.whl.metadata (4.6 kB)
+Collecting greenlet!=0.4.17 (from sqlalchemy==2.0.35->-r requirements.txt (line 5))
+  Downloading greenlet-3.4.0-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (3.7 kB)
+Collecting httptools>=0.5.0 (from uvicorn[standard]==0.30.6->-r requirements.txt (line 2))
+  Downloading httptools-0.7.1-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (3.5 kB)
+Collecting pyyaml>=5.1 (from uvicorn[standard]==0.30.6->-r requirements.txt (line 2))
+  Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+Collecting uvloop!=0.15.0,!=0.15.1,>=0.14.0 (from uvicorn[standard]==0.30.6->-r requirements.txt (line 2))
+  Downloading uvloop-0.22.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (4.9 kB)
+Collecting watchfiles>=0.13 (from uvicorn[standard]==0.30.6->-r requirements.txt (line 2))
+  Downloading watchfiles-1.1.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
+Collecting websockets>=10.4 (from uvicorn[standard]==0.30.6->-r requirements.txt (line 2))
+  Downloading websockets-16.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (6.8 kB)
+Collecting anyio<5,>=3.4.0 (from starlette<0.39.0,>=0.37.2->fastapi==0.115.0->-r requirements.txt (line 1))
+  Downloading anyio-4.13.0-py3-none-any.whl.metadata (4.5 kB)
+Downloading fastapi-0.115.0-py3-none-any.whl (94 kB)
+Downloading pydantic-2.9.2-py3-none-any.whl (434 kB)
+Downloading uvicorn-0.30.6-py3-none-any.whl (62 kB)
+Downloading requests-2.32.3-py3-none-any.whl (64 kB)
+Downloading beautifulsoup4-4.12.3-py3-none-any.whl (147 kB)
+Downloading SQLAlchemy-2.0.35-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.2/3.2 MB 1.4 MB/s  0:00:02
+Downloading psycopg2_binary-2.9.9-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.0/3.0 MB 1.3 MB/s  0:00:02
+Downloading python_dotenv-1.0.1-py3-none-any.whl (19 kB)
+Downloading pydantic_core-2.23.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 2.0 MB/s  0:00:00
+Downloading charset_normalizer-3.4.7-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (216 kB)
+Downloading idna-3.11-py3-none-any.whl (71 kB)
+Downloading starlette-0.38.6-py3-none-any.whl (71 kB)
+Downloading anyio-4.13.0-py3-none-any.whl (114 kB)
+Downloading urllib3-2.6.3-py3-none-any.whl (131 kB)
+Downloading annotated_types-0.7.0-py3-none-any.whl (13 kB)
+Downloading certifi-2026.2.25-py3-none-any.whl (153 kB)
+Downloading click-8.3.2-py3-none-any.whl (108 kB)
+Downloading greenlet-3.4.0-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (615 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 615.1/615.1 kB 1.2 MB/s  0:00:00
+Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+Downloading httptools-0.7.1-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (517 kB)
+Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 1.8 MB/s  0:00:00
+Downloading soupsieve-2.8.3-py3-none-any.whl (37 kB)
+Downloading typing_extensions-4.15.0-py3-none-any.whl (44 kB)
+Downloading uvloop-0.22.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (4.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.4/4.4 MB 2.1 MB/s  0:00:02
+Downloading watchfiles-1.1.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (456 kB)
+Downloading websockets-16.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (184 kB)
+Installing collected packages: websockets, uvloop, urllib3, typing-extensions, soupsieve, pyyaml, python-dotenv, psycopg2-binary, idna, httptools, h11, greenlet, click, charset-normalizer, certifi, annotated-types, uvicorn, sqlalchemy, requests, pydantic-core, beautifulsoup4, anyio, watchfiles, starlette, pydantic, fastapi
+Successfully installed annotated-types-0.7.0 anyio-4.13.0 beautifulsoup4-4.12.3 certifi-2026.2.25 charset-normalizer-3.4.7 click-8.3.2 fastapi-0.115.0 greenlet-3.4.0 h11-0.16.0 httptools-0.7.1 idna-3.11 psycopg2-binary-2.9.9 pydantic-2.9.2 pydantic-core-2.23.4 python-dotenv-1.0.1 pyyaml-6.0.3 requests-2.32.3 soupsieve-2.8.3 sqlalchemy-2.0.35 starlette-0.38.6 typing-extensions-4.15.0 urllib3-2.6.3 uvicorn-0.30.6 uvloop-0.22.1 watchfiles-1.1.1 websockets-16.0
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ pip list
+Package            Version
+------------------ ---------
+annotated-types    0.7.0
+anyio              4.13.0
+beautifulsoup4     4.12.3
+certifi            2026.2.25
+charset-normalizer 3.4.7
+click              8.3.2
+fastapi            0.115.0
+greenlet           3.4.0
+h11                0.16.0
+httptools          0.7.1
+idna               3.11
+pip                26.0.1
+psycopg2-binary    2.9.9
+pydantic           2.9.2
+pydantic_core      2.23.4
+python-dotenv      1.0.1
+PyYAML             6.0.3
+requests           2.32.3
+soupsieve          2.8.3
+SQLAlchemy         2.0.35
+starlette          0.38.6
+typing_extensions  4.15.0
+urllib3            2.6.3
+uvicorn            0.30.6
+uvloop             0.22.1
+watchfiles         1.1.1
+websockets         16.0
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ sudo apt install -y postgresql postgresql-contrib
+[sudo] password for amran:
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following packages were automatically installed and are no longer required:
+  libdrm-nouveau2 libdrm-radeon1 libgl1-amber-dri libglapi-mesa libwayland-server0 libxcb-dri2-0
+Use 'sudo apt autoremove' to remove them.
+The following additional packages will be installed:
+  libcommon-sense-perl libjson-perl libjson-xs-perl libpq5 libtypes-serialiser-perl libxslt1.1 postgresql-16 postgresql-client-16
+  postgresql-client-common postgresql-common ssl-cert sysstat
+Suggested packages:
+  postgresql-doc postgresql-doc-16 isag
+The following NEW packages will be installed:
+  libcommon-sense-perl libjson-perl libjson-xs-perl libpq5 libtypes-serialiser-perl libxslt1.1 postgresql postgresql-16
+  postgresql-client-16 postgresql-client-common postgresql-common postgresql-contrib ssl-cert sysstat
+0 upgraded, 14 newly installed, 0 to remove and 2 not upgraded.
+Need to get 18.1 MB of archives.
+After this operation, 53.5 MB of additional disk space will be used.
+Get:1 http://archive.ubuntu.com/ubuntu noble/main amd64 libjson-perl all 4.10000-1 [81.9 kB]
+Get:2 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 postgresql-client-common all 257build1.1 [36.4 kB]
+Get:3 http://archive.ubuntu.com/ubuntu noble/main amd64 ssl-cert all 1.1.2ubuntu1 [17.8 kB]
+Get:4 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 postgresql-common all 257build1.1 [161 kB]
+Get:5 http://archive.ubuntu.com/ubuntu noble/main amd64 sysstat amd64 12.6.1-2 [489 kB]
+Get:6 http://archive.ubuntu.com/ubuntu noble/main amd64 libcommon-sense-perl amd64 3.75-3build3 [20.4 kB]
+Get:7 http://archive.ubuntu.com/ubuntu noble/main amd64 libtypes-serialiser-perl all 1.01-1 [11.6 kB]
+Get:8 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libjson-xs-perl amd64 4.040-0ubuntu0.24.04.1 [83.7 kB]
+Get:9 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libpq5 amd64 16.13-0ubuntu0.24.04.1 [146 kB]
+Get:10 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libxslt1.1 amd64 1.1.39-0exp1ubuntu0.24.04.3 [168 kB]
+Get:11 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 postgresql-client-16 amd64 16.13-0ubuntu0.24.04.1 [1298 kB]
+Get:12 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 postgresql-16 amd64 16.13-0ubuntu0.24.04.1 [15.6 MB]
+Get:13 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 postgresql all 16+257build1.1 [11.6 kB]
+Get:14 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 postgresql-contrib all 16+257build1.1 [11.6 kB]
+Fetched 18.1 MB in 18s (1031 kB/s)
+Preconfiguring packages ...
+Selecting previously unselected package libjson-perl.
+(Reading database ... 47865 files and directories currently installed.)
+Preparing to unpack .../00-libjson-perl_4.10000-1_all.deb ...
+Unpacking libjson-perl (4.10000-1) ...
+Selecting previously unselected package postgresql-client-common.
+Preparing to unpack .../01-postgresql-client-common_257build1.1_all.deb ...
+Unpacking postgresql-client-common (257build1.1) ...
+Selecting previously unselected package ssl-cert.
+Preparing to unpack .../02-ssl-cert_1.1.2ubuntu1_all.deb ...
+Unpacking ssl-cert (1.1.2ubuntu1) ...
+Selecting previously unselected package postgresql-common.
+Preparing to unpack .../03-postgresql-common_257build1.1_all.deb ...
+Adding 'diversion of /usr/bin/pg_config to /usr/bin/pg_config.libpq-dev by postgresql-common'
+Unpacking postgresql-common (257build1.1) ...
+Selecting previously unselected package sysstat.
+Preparing to unpack .../04-sysstat_12.6.1-2_amd64.deb ...
+Unpacking sysstat (12.6.1-2) ...
+Selecting previously unselected package libcommon-sense-perl:amd64.
+Preparing to unpack .../05-libcommon-sense-perl_3.75-3build3_amd64.deb ...
+Unpacking libcommon-sense-perl:amd64 (3.75-3build3) ...
+Selecting previously unselected package libtypes-serialiser-perl.
+Preparing to unpack .../06-libtypes-serialiser-perl_1.01-1_all.deb ...
+Unpacking libtypes-serialiser-perl (1.01-1) ...
+Selecting previously unselected package libjson-xs-perl.
+Preparing to unpack .../07-libjson-xs-perl_4.040-0ubuntu0.24.04.1_amd64.deb ...
+Unpacking libjson-xs-perl (4.040-0ubuntu0.24.04.1) ...
+Selecting previously unselected package libpq5:amd64.
+Preparing to unpack .../08-libpq5_16.13-0ubuntu0.24.04.1_amd64.deb ...
+Unpacking libpq5:amd64 (16.13-0ubuntu0.24.04.1) ...
+Selecting previously unselected package libxslt1.1:amd64.
+Preparing to unpack .../09-libxslt1.1_1.1.39-0exp1ubuntu0.24.04.3_amd64.deb ...
+Unpacking libxslt1.1:amd64 (1.1.39-0exp1ubuntu0.24.04.3) ...
+Selecting previously unselected package postgresql-client-16.
+Preparing to unpack .../10-postgresql-client-16_16.13-0ubuntu0.24.04.1_amd64.deb ...
+Unpacking postgresql-client-16 (16.13-0ubuntu0.24.04.1) ...
+Selecting previously unselected package postgresql-16.
+Preparing to unpack .../11-postgresql-16_16.13-0ubuntu0.24.04.1_amd64.deb ...
+Unpacking postgresql-16 (16.13-0ubuntu0.24.04.1) ...
+Selecting previously unselected package postgresql.
+Preparing to unpack .../12-postgresql_16+257build1.1_all.deb ...
+Unpacking postgresql (16+257build1.1) ...
+Selecting previously unselected package postgresql-contrib.
+Preparing to unpack .../13-postgresql-contrib_16+257build1.1_all.deb ...
+Unpacking postgresql-contrib (16+257build1.1) ...
+Setting up postgresql-client-common (257build1.1) ...
+Setting up libpq5:amd64 (16.13-0ubuntu0.24.04.1) ...
+Setting up libcommon-sense-perl:amd64 (3.75-3build3) ...
+Setting up ssl-cert (1.1.2ubuntu1) ...
+Created symlink /etc/systemd/system/multi-user.target.wants/ssl-cert.service → /usr/lib/systemd/system/ssl-cert.service.
+Setting up libtypes-serialiser-perl (1.01-1) ...
+Setting up libjson-perl (4.10000-1) ...
+Setting up libxslt1.1:amd64 (1.1.39-0exp1ubuntu0.24.04.3) ...
+Setting up sysstat (12.6.1-2) ...
+
+Creating config file /etc/default/sysstat with new version
+update-alternatives: using /usr/bin/sar.sysstat to provide /usr/bin/sar (sar) in auto mode
+Created symlink /etc/systemd/system/sysstat.service.wants/sysstat-collect.timer → /usr/lib/systemd/system/sysstat-collect.timer.
+Created symlink /etc/systemd/system/sysstat.service.wants/sysstat-summary.timer → /usr/lib/systemd/system/sysstat-summary.timer.
+Created symlink /etc/systemd/system/multi-user.target.wants/sysstat.service → /usr/lib/systemd/system/sysstat.service.
+Setting up libjson-xs-perl (4.040-0ubuntu0.24.04.1) ...
+Setting up postgresql-client-16 (16.13-0ubuntu0.24.04.1) ...
+update-alternatives: using /usr/share/postgresql/16/man/man1/psql.1.gz to provide /usr/share/man/man1/psql.1.gz (psql.1.gz) in auto mode
+Setting up postgresql-common (257build1.1) ...
+
+Creating config file /etc/postgresql-common/createcluster.conf with new version
+Building PostgreSQL dictionaries from installed myspell/hunspell packages...
+Removing obsolete dictionary files:
+Created symlink /etc/systemd/system/multi-user.target.wants/postgresql.service → /usr/lib/systemd/system/postgresql.service.
+Setting up postgresql-16 (16.13-0ubuntu0.24.04.1) ...
+Creating new PostgreSQL cluster 16/main ...
+/usr/lib/postgresql/16/bin/initdb -D /var/lib/postgresql/16/main --auth-local peer --auth-host scram-sha-256 --no-instructions
+The files belonging to this database system will be owned by user "postgres".
+This user must also own the server process.
+
+The database cluster will be initialized with locale "C.UTF-8".
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+fixing permissions on existing directory /var/lib/postgresql/16/main ... ok
+creating subdirectories ... ok
+selecting dynamic shared memory implementation ... posix
+selecting default max_connections ... 100
+selecting default shared_buffers ... 128MB
+selecting default time zone ... Asia/Baghdad
+creating configuration files ... ok
+running bootstrap script ... ok
+performing post-bootstrap initialization ... ok
+syncing data to disk ... ok
+Setting up postgresql-contrib (16+257build1.1) ...
+Setting up postgresql (16+257build1.1) ...
+Processing triggers for man-db (2.12.0-4build2) ...
+Processing triggers for libc-bin (2.39-0ubuntu8.7) ...
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ sudo systemctl start postgresql
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ sudo systemctl status postgresql
+● postgresql.service - PostgreSQL RDBMS
+     Loaded: loaded (/usr/lib/systemd/system/postgresql.service; enabled; preset: enabled)
+     Active: active (exited) since Wed 2026-04-15 19:29:06 +03; 44s ago
+   Main PID: 2229 (code=exited, status=0/SUCCESS)
+        CPU: 3ms
+
+Apr 15 19:29:06 Surface systemd[1]: Starting postgresql.service - PostgreSQL RDBMS...
+Apr 15 19:29:06 Surface systemd[1]: Finished postgresql.service - PostgreSQL RDBMS.
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ sudo -u postgres psql
+psql (16.13 (Ubuntu 16.13-0ubuntu0.24.04.1))
+Type "help" for help.
+
+postgres=# CREATE DATABASE scraper_db;
+CREATE USER scraper_user WITH PASSWORD '1234';
+ALTER ROLE scraper_user SET client_encoding TO 'utf8';
+ALTER ROLE scraper_user SET default_transaction_isolation TO 'read committed';
+ALTER ROLE scraper_user SET timezone TO 'UTC';
+GRANT ALL PRIVILEGES ON DATABASE scraper_db TO scraper_user;
+\q
+CREATE DATABASE
+CREATE ROLE
+ALTER ROLE
+ALTER ROLE
+ALTER ROLE
+GRANT
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ psql -h localhost -U scraper_user -d scraper_db
+Password for user scraper_user:
+psql (16.13 (Ubuntu 16.13-0ubuntu0.24.04.1))
+SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, compression: off)
+Type "help" for help.
+
+scraper_db=> \q
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ psql -h localhost -U scraper_user -d scraper_db
+Password for user scraper_user:
+psql (16.13 (Ubuntu 16.13-0ubuntu0.24.04.1))
+SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, compression: off)
+Type "help" for help.
+
+scraper_db=> \q
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$
+
+amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service$ cd /mnt/c/Data\ enginering/A1-Data-Engineering-Bootcamp/Week-05
+mkdir -p Project-Scraper-API-Service
+cd Project-Scraper-API-Service
+pwd
+-bash: cd: /mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05: No such file or directory
+/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service
+amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ mkdir -p app scripts data systemd debian docs tests
+touch main.py requirements.txt README.md .gitignore
+touch app/__init__.py
+touch app/config.py app/database.py app/models.py app/schemas.py app/scraper.py app/cleaner.py app/crud.py app/api.py
+touch scripts/init_db.py scripts/run_scraper.py
+amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ find . -maxdepth 2 | sort
+.
+./.gitignore
+./README.md
+./app
+./app/__init__.py
+./app/api.py
+./app/cleaner.py
+./app/config.py
+./app/crud.py
+./app/database.py
+./app/models.py
+./app/schemas.py
+./app/scraper.py
+./data
+./debian
+./docs
+./main.py
+./requirements.txt
+./scripts
+./scripts/init_db.py
+./scripts/run_scraper.py
+./systemd
+./tests
+amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ cat > requirements.txt << 'EOF'
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+requests==2.32.3
+beautifulsoup4==4.12.3
+sqlalchemy==2.0.35
+psycopg2-binary==2.9.9
+pydantic==2.9.2
+python-dotenv==1.0.1
+EOF
+amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ cat > .gitignore << 'EOF'
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Environment files
+.env
+
+# Database / local data
+*.db
+data/*.json
+data/*.csv
+data/*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build artifacts
+build/
+dist/
+EOFuildinfockage output
+amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ cat > README.md << 'EOF'
+# Scraper API Service
+
+A complete data engineering mini-project that starts with a web scraping script and ends with a deployable Ubuntu service.
+
+## Project Idea
+
+This project scrapes product data from an e-commerce test website, cleans and structures the data, stores it in PostgreSQL, and exposes it through FastAPI endpoints.
+
+The final application is designed to run as a background service on Ubuntu using systemd, with firewall configuration and Debian packaging support.
+
+## Main Features
+
+- Scrape product data from a public website
+- Clean and normalize the scraped data
+- Store data in PostgreSQL
+- Expose the data through FastAPI endpoints
+- Run as a Linux service using systemd
+- Prepare the project for packaging as a `.deb` package
+
+## Tech Stack
+
+- Python
+- BeautifulSoup
+- Requests
+- PostgreSQL
+- SQLAlchemy
+- FastAPI
+- Uvicorn
+- systemd
+- UFW
+- Debian packaging
+
+.gitignorets.txtture
+>
+> ^C
+amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ pwd
+/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service
+amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ python3 -m venv .venv
+amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ source .venv/bin/activate
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ python -m pip install --upgrade pip
+Requirement already satisfied: pip in ./.venv/lib/python3.12/site-packages (24.0)
+Collecting pip
+  Downloading pip-26.0.1-py3-none-any.whl.metadata (4.7 kB)
+Downloading pip-26.0.1-py3-none-any.whl (1.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 1.1 MB/s eta 0:00:00
+Installing collected packages: pip
+  Attempting uninstall: pip
+    Found existing installation: pip 24.0
+    Uninstalling pip-24.0:
+      Successfully uninstalled pip-24.0
+Successfully installed pip-26.0.1
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ pip install -r requirements.txt
+Collecting fastapi==0.115.0 (from -r requirements.txt (line 1))
+  Downloading fastapi-0.115.0-py3-none-any.whl.metadata (27 kB)
+Collecting uvicorn==0.30.6 (from uvicorn[standard]==0.30.6->-r requirements.txt (line 2))
+  Downloading uvicorn-0.30.6-py3-none-any.whl.metadata (6.6 kB)
+Collecting requests==2.32.3 (from -r requirements.txt (line 3))
+  Downloading requests-2.32.3-py3-none-any.whl.metadata (4.6 kB)
+Collecting beautifulsoup4==4.12.3 (from -r requirements.txt (line 4))
+  Downloading beautifulsoup4-4.12.3-py3-none-any.whl.metadata (3.8 kB)
+Collecting sqlalchemy==2.0.35 (from -r requirements.txt (line 5))
+  Downloading SQLAlchemy-2.0.35-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.6 kB)
+Collecting psycopg2-binary==2.9.9 (from -r requirements.txt (line 6))
+  Downloading psycopg2_binary-2.9.9-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.4 kB)
+Collecting pydantic==2.9.2 (from -r requirements.txt (line 7))
+  Downloading pydantic-2.9.2-py3-none-any.whl.metadata (149 kB)
+Collecting python-dotenv==1.0.1 (from -r requirements.txt (line 8))
+  Downloading python_dotenv-1.0.1-py3-none-any.whl.metadata (23 kB)
+Collecting starlette<0.39.0,>=0.37.2 (from fastapi==0.115.0->-r requirements.txt (line 1))
+  Downloading starlette-0.38.6-py3-none-any.whl.metadata (6.0 kB)
+Collecting typing-extensions>=4.8.0 (from fastapi==0.115.0->-r requirements.txt (line 1))
+  Downloading typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting annotated-types>=0.6.0 (from pydantic==2.9.2->-r requirements.txt (line 7))
+  Downloading annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
+Collecting pydantic-core==2.23.4 (from pydantic==2.9.2->-r requirements.txt (line 7))
+  Downloading pydantic_core-2.23.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)
+Collecting click>=7.0 (from uvicorn==0.30.6->uvicorn[standard]==0.30.6->-r requirements.txt (line 2))
+  Downloading click-8.3.2-py3-none-any.whl.metadata (2.6 kB)
+Collecting h11>=0.8 (from uvicorn==0.30.6->uvicorn[standard]==0.30.6->-r requirements.txt (line 2))
+  Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+Collecting charset-normalizer<4,>=2 (from requests==2.32.3->-r requirements.txt (line 3))
+  Downloading charset_normalizer-3.4.7-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+Collecting idna<4,>=2.5 (from requests==2.32.3->-r requirements.txt (line 3))
+  Downloading idna-3.11-py3-none-any.whl.metadata (8.4 kB)
+Collecting urllib3<3,>=1.21.1 (from requests==2.32.3->-r requirements.txt (line 3))
+  Downloading urllib3-2.6.3-py3-none-any.whl.metadata (6.9 kB)
+Collecting certifi>=2017.4.17 (from requests==2.32.3->-r requirements.txt (line 3))
+  Downloading certifi-2026.2.25-py3-none-any.whl.metadata (2.5 kB)
+Collecting soupsieve>1.2 (from beautifulsoup4==4.12.3->-r requirements.txt (line 4))
+  Downloading soupsieve-2.8.3-py3-none-any.whl.metadata (4.6 kB)
+Collecting greenlet!=0.4.17 (from sqlalchemy==2.0.35->-r requirements.txt (line 5))
+  Downloading greenlet-3.4.0-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (3.7 kB)
+Collecting httptools>=0.5.0 (from uvicorn[standard]==0.30.6->-r requirements.txt (line 2))
+  Downloading httptools-0.7.1-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (3.5 kB)
+Collecting pyyaml>=5.1 (from uvicorn[standard]==0.30.6->-r requirements.txt (line 2))
+  Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+Collecting uvloop!=0.15.0,!=0.15.1,>=0.14.0 (from uvicorn[standard]==0.30.6->-r requirements.txt (line 2))
+  Downloading uvloop-0.22.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (4.9 kB)
+Collecting watchfiles>=0.13 (from uvicorn[standard]==0.30.6->-r requirements.txt (line 2))
+  Downloading watchfiles-1.1.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
+Collecting websockets>=10.4 (from uvicorn[standard]==0.30.6->-r requirements.txt (line 2))
+  Downloading websockets-16.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (6.8 kB)
+Collecting anyio<5,>=3.4.0 (from starlette<0.39.0,>=0.37.2->fastapi==0.115.0->-r requirements.txt (line 1))
+  Downloading anyio-4.13.0-py3-none-any.whl.metadata (4.5 kB)
+Downloading fastapi-0.115.0-py3-none-any.whl (94 kB)
+Downloading pydantic-2.9.2-py3-none-any.whl (434 kB)
+Downloading uvicorn-0.30.6-py3-none-any.whl (62 kB)
+Downloading requests-2.32.3-py3-none-any.whl (64 kB)
+Downloading beautifulsoup4-4.12.3-py3-none-any.whl (147 kB)
+Downloading SQLAlchemy-2.0.35-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.2/3.2 MB 1.4 MB/s  0:00:02
+Downloading psycopg2_binary-2.9.9-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.0/3.0 MB 1.3 MB/s  0:00:02
+Downloading python_dotenv-1.0.1-py3-none-any.whl (19 kB)
+Downloading pydantic_core-2.23.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 2.0 MB/s  0:00:00
+Downloading charset_normalizer-3.4.7-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (216 kB)
+Downloading idna-3.11-py3-none-any.whl (71 kB)
+Downloading starlette-0.38.6-py3-none-any.whl (71 kB)
+Downloading anyio-4.13.0-py3-none-any.whl (114 kB)
+Downloading urllib3-2.6.3-py3-none-any.whl (131 kB)
+Downloading annotated_types-0.7.0-py3-none-any.whl (13 kB)
+Downloading certifi-2026.2.25-py3-none-any.whl (153 kB)
+Downloading click-8.3.2-py3-none-any.whl (108 kB)
+Downloading greenlet-3.4.0-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (615 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 615.1/615.1 kB 1.2 MB/s  0:00:00
+Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+Downloading httptools-0.7.1-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (517 kB)
+Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 1.8 MB/s  0:00:00
+Downloading soupsieve-2.8.3-py3-none-any.whl (37 kB)
+Downloading typing_extensions-4.15.0-py3-none-any.whl (44 kB)
+Downloading uvloop-0.22.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (4.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.4/4.4 MB 2.1 MB/s  0:00:02
+Downloading watchfiles-1.1.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (456 kB)
+Downloading websockets-16.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (184 kB)
+Installing collected packages: websockets, uvloop, urllib3, typing-extensions, soupsieve, pyyaml, python-dotenv, psycopg2-binary, idna, httptools, h11, greenlet, click, charset-normalizer, certifi, annotated-types, uvicorn, sqlalchemy, requests, pydantic-core, beautifulsoup4, anyio, watchfiles, starlette, pydantic, fastapi
+Successfully installed annotated-types-0.7.0 anyio-4.13.0 beautifulsoup4-4.12.3 certifi-2026.2.25 charset-normalizer-3.4.7 click-8.3.2 fastapi-0.115.0 greenlet-3.4.0 h11-0.16.0 httptools-0.7.1 idna-3.11 psycopg2-binary-2.9.9 pydantic-2.9.2 pydantic-core-2.23.4 python-dotenv-1.0.1 pyyaml-6.0.3 requests-2.32.3 soupsieve-2.8.3 sqlalchemy-2.0.35 starlette-0.38.6 typing-extensions-4.15.0 urllib3-2.6.3 uvicorn-0.30.6 uvloop-0.22.1 watchfiles-1.1.1 websockets-16.0
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ pip list
+Package            Version
+------------------ ---------
+annotated-types    0.7.0
+anyio              4.13.0
+beautifulsoup4     4.12.3
+certifi            2026.2.25
+charset-normalizer 3.4.7
+click              8.3.2
+fastapi            0.115.0
+greenlet           3.4.0
+h11                0.16.0
+httptools          0.7.1
+idna               3.11
+pip                26.0.1
+psycopg2-binary    2.9.9
+pydantic           2.9.2
+pydantic_core      2.23.4
+python-dotenv      1.0.1
+PyYAML             6.0.3
+requests           2.32.3
+soupsieve          2.8.3
+SQLAlchemy         2.0.35
+starlette          0.38.6
+typing_extensions  4.15.0
+urllib3            2.6.3
+uvicorn            0.30.6
+uvloop             0.22.1
+watchfiles         1.1.1
+websockets         16.0
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ sudo apt install -y postgresql postgresql-contrib
+[sudo] password for amran:
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following packages were automatically installed and are no longer required:
+  libdrm-nouveau2 libdrm-radeon1 libgl1-amber-dri libglapi-mesa libwayland-server0 libxcb-dri2-0
+Use 'sudo apt autoremove' to remove them.
+The following additional packages will be installed:
+  libcommon-sense-perl libjson-perl libjson-xs-perl libpq5 libtypes-serialiser-perl libxslt1.1 postgresql-16 postgresql-client-16
+  postgresql-client-common postgresql-common ssl-cert sysstat
+Suggested packages:
+  postgresql-doc postgresql-doc-16 isag
+The following NEW packages will be installed:
+  libcommon-sense-perl libjson-perl libjson-xs-perl libpq5 libtypes-serialiser-perl libxslt1.1 postgresql postgresql-16
+  postgresql-client-16 postgresql-client-common postgresql-common postgresql-contrib ssl-cert sysstat
+0 upgraded, 14 newly installed, 0 to remove and 2 not upgraded.
+Need to get 18.1 MB of archives.
+After this operation, 53.5 MB of additional disk space will be used.
+Get:1 http://archive.ubuntu.com/ubuntu noble/main amd64 libjson-perl all 4.10000-1 [81.9 kB]
+Get:2 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 postgresql-client-common all 257build1.1 [36.4 kB]
+Get:3 http://archive.ubuntu.com/ubuntu noble/main amd64 ssl-cert all 1.1.2ubuntu1 [17.8 kB]
+Get:4 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 postgresql-common all 257build1.1 [161 kB]
+Get:5 http://archive.ubuntu.com/ubuntu noble/main amd64 sysstat amd64 12.6.1-2 [489 kB]
+Get:6 http://archive.ubuntu.com/ubuntu noble/main amd64 libcommon-sense-perl amd64 3.75-3build3 [20.4 kB]
+Get:7 http://archive.ubuntu.com/ubuntu noble/main amd64 libtypes-serialiser-perl all 1.01-1 [11.6 kB]
+Get:8 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libjson-xs-perl amd64 4.040-0ubuntu0.24.04.1 [83.7 kB]
+Get:9 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libpq5 amd64 16.13-0ubuntu0.24.04.1 [146 kB]
+Get:10 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 libxslt1.1 amd64 1.1.39-0exp1ubuntu0.24.04.3 [168 kB]
+Get:11 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 postgresql-client-16 amd64 16.13-0ubuntu0.24.04.1 [1298 kB]
+Get:12 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 postgresql-16 amd64 16.13-0ubuntu0.24.04.1 [15.6 MB]
+Get:13 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 postgresql all 16+257build1.1 [11.6 kB]
+Get:14 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 postgresql-contrib all 16+257build1.1 [11.6 kB]
+Fetched 18.1 MB in 18s (1031 kB/s)
+Preconfiguring packages ...
+Selecting previously unselected package libjson-perl.
+(Reading database ... 47865 files and directories currently installed.)
+Preparing to unpack .../00-libjson-perl_4.10000-1_all.deb ...
+Unpacking libjson-perl (4.10000-1) ...
+Selecting previously unselected package postgresql-client-common.
+Preparing to unpack .../01-postgresql-client-common_257build1.1_all.deb ...
+Unpacking postgresql-client-common (257build1.1) ...
+Selecting previously unselected package ssl-cert.
+Preparing to unpack .../02-ssl-cert_1.1.2ubuntu1_all.deb ...
+Unpacking ssl-cert (1.1.2ubuntu1) ...
+Selecting previously unselected package postgresql-common.
+Preparing to unpack .../03-postgresql-common_257build1.1_all.deb ...
+Adding 'diversion of /usr/bin/pg_config to /usr/bin/pg_config.libpq-dev by postgresql-common'
+Unpacking postgresql-common (257build1.1) ...
+Selecting previously unselected package sysstat.
+Preparing to unpack .../04-sysstat_12.6.1-2_amd64.deb ...
+Unpacking sysstat (12.6.1-2) ...
+Selecting previously unselected package libcommon-sense-perl:amd64.
+Preparing to unpack .../05-libcommon-sense-perl_3.75-3build3_amd64.deb ...
+Unpacking libcommon-sense-perl:amd64 (3.75-3build3) ...
+Selecting previously unselected package libtypes-serialiser-perl.
+Preparing to unpack .../06-libtypes-serialiser-perl_1.01-1_all.deb ...
+Unpacking libtypes-serialiser-perl (1.01-1) ...
+Selecting previously unselected package libjson-xs-perl.
+Preparing to unpack .../07-libjson-xs-perl_4.040-0ubuntu0.24.04.1_amd64.deb ...
+Unpacking libjson-xs-perl (4.040-0ubuntu0.24.04.1) ...
+Selecting previously unselected package libpq5:amd64.
+Preparing to unpack .../08-libpq5_16.13-0ubuntu0.24.04.1_amd64.deb ...
+Unpacking libpq5:amd64 (16.13-0ubuntu0.24.04.1) ...
+Selecting previously unselected package libxslt1.1:amd64.
+Preparing to unpack .../09-libxslt1.1_1.1.39-0exp1ubuntu0.24.04.3_amd64.deb ...
+Unpacking libxslt1.1:amd64 (1.1.39-0exp1ubuntu0.24.04.3) ...
+Selecting previously unselected package postgresql-client-16.
+Preparing to unpack .../10-postgresql-client-16_16.13-0ubuntu0.24.04.1_amd64.deb ...
+Unpacking postgresql-client-16 (16.13-0ubuntu0.24.04.1) ...
+Selecting previously unselected package postgresql-16.
+Preparing to unpack .../11-postgresql-16_16.13-0ubuntu0.24.04.1_amd64.deb ...
+Unpacking postgresql-16 (16.13-0ubuntu0.24.04.1) ...
+Selecting previously unselected package postgresql.
+Preparing to unpack .../12-postgresql_16+257build1.1_all.deb ...
+Unpacking postgresql (16+257build1.1) ...
+Selecting previously unselected package postgresql-contrib.
+Preparing to unpack .../13-postgresql-contrib_16+257build1.1_all.deb ...
+Unpacking postgresql-contrib (16+257build1.1) ...
+Setting up postgresql-client-common (257build1.1) ...
+Setting up libpq5:amd64 (16.13-0ubuntu0.24.04.1) ...
+Setting up libcommon-sense-perl:amd64 (3.75-3build3) ...
+Setting up ssl-cert (1.1.2ubuntu1) ...
+Created symlink /etc/systemd/system/multi-user.target.wants/ssl-cert.service → /usr/lib/systemd/system/ssl-cert.service.
+Setting up libtypes-serialiser-perl (1.01-1) ...
+Setting up libjson-perl (4.10000-1) ...
+Setting up libxslt1.1:amd64 (1.1.39-0exp1ubuntu0.24.04.3) ...
+Setting up sysstat (12.6.1-2) ...
+
+Creating config file /etc/default/sysstat with new version
+update-alternatives: using /usr/bin/sar.sysstat to provide /usr/bin/sar (sar) in auto mode
+Created symlink /etc/systemd/system/sysstat.service.wants/sysstat-collect.timer → /usr/lib/systemd/system/sysstat-collect.timer.
+Created symlink /etc/systemd/system/sysstat.service.wants/sysstat-summary.timer → /usr/lib/systemd/system/sysstat-summary.timer.
+Created symlink /etc/systemd/system/multi-user.target.wants/sysstat.service → /usr/lib/systemd/system/sysstat.service.
+Setting up libjson-xs-perl (4.040-0ubuntu0.24.04.1) ...
+Setting up postgresql-client-16 (16.13-0ubuntu0.24.04.1) ...
+update-alternatives: using /usr/share/postgresql/16/man/man1/psql.1.gz to provide /usr/share/man/man1/psql.1.gz (psql.1.gz) in auto mode
+Setting up postgresql-common (257build1.1) ...
+
+Creating config file /etc/postgresql-common/createcluster.conf with new version
+Building PostgreSQL dictionaries from installed myspell/hunspell packages...
+Removing obsolete dictionary files:
+Created symlink /etc/systemd/system/multi-user.target.wants/postgresql.service → /usr/lib/systemd/system/postgresql.service.
+Setting up postgresql-16 (16.13-0ubuntu0.24.04.1) ...
+Creating new PostgreSQL cluster 16/main ...
+/usr/lib/postgresql/16/bin/initdb -D /var/lib/postgresql/16/main --auth-local peer --auth-host scram-sha-256 --no-instructions
+The files belonging to this database system will be owned by user "postgres".
+This user must also own the server process.
+
+The database cluster will be initialized with locale "C.UTF-8".
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+fixing permissions on existing directory /var/lib/postgresql/16/main ... ok
+creating subdirectories ... ok
+selecting dynamic shared memory implementation ... posix
+selecting default max_connections ... 100
+selecting default shared_buffers ... 128MB
+selecting default time zone ... Asia/Baghdad
+creating configuration files ... ok
+running bootstrap script ... ok
+performing post-bootstrap initialization ... ok
+syncing data to disk ... ok
+Setting up postgresql-contrib (16+257build1.1) ...
+Setting up postgresql (16+257build1.1) ...
+Processing triggers for man-db (2.12.0-4build2) ...
+Processing triggers for libc-bin (2.39-0ubuntu8.7) ...
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ sudo systemctl start postgresql
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ sudo systemctl status postgresql
+● postgresql.service - PostgreSQL RDBMS
+     Loaded: loaded (/usr/lib/systemd/system/postgresql.service; enabled; preset: enabled)
+     Active: active (exited) since Wed 2026-04-15 19:29:06 +03; 44s ago
+   Main PID: 2229 (code=exited, status=0/SUCCESS)
+        CPU: 3ms
+
+Apr 15 19:29:06 Surface systemd[1]: Starting postgresql.service - PostgreSQL RDBMS...
+Apr 15 19:29:06 Surface systemd[1]: Finished postgresql.service - PostgreSQL RDBMS.
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ sudo -u postgres psql
+psql (16.13 (Ubuntu 16.13-0ubuntu0.24.04.1))
+Type "help" for help.
+
+postgres=# CREATE DATABASE scraper_db;
+CREATE USER scraper_user WITH PASSWORD '1234';
+ALTER ROLE scraper_user SET client_encoding TO 'utf8';
+ALTER ROLE scraper_user SET default_transaction_isolation TO 'read committed';
+ALTER ROLE scraper_user SET timezone TO 'UTC';
+GRANT ALL PRIVILEGES ON DATABASE scraper_db TO scraper_user;
+\q
+CREATE DATABASE
+CREATE ROLE
+ALTER ROLE
+ALTER ROLE
+ALTER ROLE
+GRANT
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ psql -h localhost -U scraper_user -d scraper_db
+Password for user scraper_user:
+psql (16.13 (Ubuntu 16.13-0ubuntu0.24.04.1))
+SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, compression: off)
+Type "help" for help.
+
+scraper_db=> \q
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ psql -h localhost -U scraper_user -d scraper_db
+Password for user scraper_user:
+psql (16.13 (Ubuntu 16.13-0ubuntu0.24.04.1))
+SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, compression: off)
+Type "help" for help.
+
+scraper_db=> \q
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ cat > .env << 'EOF'
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=scraper_db
+DB_USER=scraper_user
+DB_PASSWORD=1234
+DATABASE_URL=postgresql+psycopg2://scraper_user:1234@localhost:5432/scraper_db
+EOF
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ cat > app/config.py << 'EOF'
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = os.getenv("DB_PORT", "5432")
+DB_NAME = os.getenv("DB_NAME", "scraper_db")
+DB_USER = os.getenv("DB_USER", "scraper_user")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "1234")
+
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+)
+EOF
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ cat > app/database.py << 'EOF'
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+from app.config import DATABASE_URL
+
+engine = create_engine(DATABASE_URL, echo=True)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+EOF
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ cat > app/models.py << 'EOF'
+from sqlalchemy import Column, Integer, String, Numeric, Text, DateTime
+from sqlalchemy.sql import func
+from app.database import Base
+
+
+class Product(Base):
+    __tablename__ = "products"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(255), nullable=False)
+    price = Column(Numeric(10, 2), nullable=False)
+    description = Column(Text, nullable=True)
+    rating = Column(Integer, nullable=False)
+    category = Column(String(100), nullable=True)
+    product_url = Column(Text, nullable=True)
+    image_url = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+EOF
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ cat > scripts/init_db.py << 'EOF'
+from app.database import engine, Base
+from app.models import Product
+
+
+def main():
+    print("Creating database tables...")
+    Base.metadata.create_all(bind=engine)
+    print("Done.")
+
+
+if __name__ == "__main__":
+    main()
+EOF
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ python scripts/init_db.py
+Traceback (most recent call last):
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/scripts/init_db.py", line 1, in <module>
+    from app.database import engine, Base
+ModuleNotFoundError: No module named 'app'
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ psql -h localhost -U scraper_user -d scraper_db -c "\dt"
+Password for user scraper_user:
+Did not find any relations.
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ psql -h localhost -U scraper_user -d scraper_db -c "\dt"
+Password for user scraper_user:
+Did not find any relations.
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ python -m scripts.init_db
+Creating database tables...
+2026-04-15 19:37:44,996 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2026-04-15 19:37:44,997 INFO sqlalchemy.engine.Engine [raw sql] {}
+2026-04-15 19:37:44,998 INFO sqlalchemy.engine.Engine select current_schema()
+2026-04-15 19:37:44,998 INFO sqlalchemy.engine.Engine [raw sql] {}
+2026-04-15 19:37:44,999 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2026-04-15 19:37:44,999 INFO sqlalchemy.engine.Engine [raw sql] {}
+2026-04-15 19:37:45,000 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-15 19:37:45,008 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace
+WHERE pg_catalog.pg_class.relname = %(table_name)s AND pg_catalog.pg_class.relkind = ANY (ARRAY[%(param_1)s, %(param_2)s, %(param_3)s, %(param_4)s, %(param_5)s]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != %(nspname_1)s
+2026-04-15 19:37:45,009 INFO sqlalchemy.engine.Engine [generated in 0.00025s] {'table_name': 'products', 'param_1': 'r', 'param_2': 'p', 'param_3': 'f', 'param_4': 'v', 'param_5': 'm', 'nspname_1': 'pg_catalog'}
+2026-04-15 19:37:45,012 INFO sqlalchemy.engine.Engine
+CREATE TABLE products (
+        id SERIAL NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        price NUMERIC(10, 2) NOT NULL,
+        description TEXT,
+        rating INTEGER NOT NULL,
+        category VARCHAR(100),
+        product_url TEXT,
+        image_url TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+        PRIMARY KEY (id)
+)
+
+
+2026-04-15 19:37:45,012 INFO sqlalchemy.engine.Engine [no key 0.00016s] {}
+2026-04-15 19:37:45,015 INFO sqlalchemy.engine.Engine ROLLBACK
+Traceback (most recent call last):
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.InsufficientPrivilege: permission denied for schema public
+LINE 2: CREATE TABLE products (
+                     ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/scripts/init_db.py", line 12, in <module>
+    main()
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/scripts/init_db.py", line 7, in main
+    Base.metadata.create_all(bind=engine)
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/sql/schema.py", line 5868, in create_all
+    bind._run_ddl_visitor(
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 3253, in _run_ddl_visitor
+    conn._run_ddl_visitor(visitorcallable, element, **kwargs)
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2459, in _run_ddl_visitor
+    visitorcallable(self.dialect, self, **kwargs).traverse_single(element)
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/sql/visitors.py", line 664, in traverse_single
+    return meth(obj, **kw)
+           ^^^^^^^^^^^^^^^
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/sql/ddl.py", line 918, in visit_metadata
+    self.traverse_single(
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/sql/visitors.py", line 664, in traverse_single
+    return meth(obj, **kw)
+           ^^^^^^^^^^^^^^^
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/sql/ddl.py", line 956, in visit_table
+    )._invoke_with(self.connection)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/sql/ddl.py", line 314, in _invoke_with
+    return bind.execute(self)
+           ^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1418, in execute
+    return meth(
+           ^^^^^
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/sql/ddl.py", line 180, in _execute_on_connection
+    return connection._execute_ddl(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1529, in _execute_ddl
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.errors.InsufficientPrivilege) permission denied for schema public
+LINE 2: CREATE TABLE products (
+                     ^
+
+[SQL:
+CREATE TABLE products (
+        id SERIAL NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        price NUMERIC(10, 2) NOT NULL,
+        description TEXT,
+        rating INTEGER NOT NULL,
+        category VARCHAR(100),
+        product_url TEXT,
+        image_url TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+        PRIMARY KEY (id)
+)
+
+]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ psql -h localhost -U scraper_user -d scraper_db -c "\dt"
+Password for user scraper_user:
+Did not find any relations.
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ sudo -u postgres psql
+psql (16.13 (Ubuntu 16.13-0ubuntu0.24.04.1))
+Type "help" for help.
+
+postgres=# GRANT ALL ON SCHEMA public TO scraper_user;
+ALTER SCHEMA public OWNER TO scraper_user;
+GRANT
+ALTER SCHEMA
+postgres=# \q
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ python -m scripts.init_db
+Creating database tables...
+2026-04-15 19:39:28,580 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2026-04-15 19:39:28,580 INFO sqlalchemy.engine.Engine [raw sql] {}
+2026-04-15 19:39:28,582 INFO sqlalchemy.engine.Engine select current_schema()
+2026-04-15 19:39:28,582 INFO sqlalchemy.engine.Engine [raw sql] {}
+2026-04-15 19:39:28,583 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2026-04-15 19:39:28,583 INFO sqlalchemy.engine.Engine [raw sql] {}
+2026-04-15 19:39:28,584 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-15 19:39:28,592 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace
+WHERE pg_catalog.pg_class.relname = %(table_name)s AND pg_catalog.pg_class.relkind = ANY (ARRAY[%(param_1)s, %(param_2)s, %(param_3)s, %(param_4)s, %(param_5)s]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != %(nspname_1)s
+2026-04-15 19:39:28,592 INFO sqlalchemy.engine.Engine [generated in 0.00022s] {'table_name': 'products', 'param_1': 'r', 'param_2': 'p', 'param_3': 'f', 'param_4': 'v', 'param_5': 'm', 'nspname_1': 'pg_catalog'}
+2026-04-15 19:39:28,594 INFO sqlalchemy.engine.Engine
+CREATE TABLE products (
+        id SERIAL NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        price NUMERIC(10, 2) NOT NULL,
+        description TEXT,
+        rating INTEGER NOT NULL,
+        category VARCHAR(100),
+        product_url TEXT,
+        image_url TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+        PRIMARY KEY (id)
+)
+
+
+2026-04-15 19:39:28,595 INFO sqlalchemy.engine.Engine [no key 0.00014s] {}
+2026-04-15 19:39:28,595 INFO sqlalchemy.engine.Engine ROLLBACK
+Traceback (most recent call last):
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.InsufficientPrivilege: permission denied for schema public
+LINE 2: CREATE TABLE products (
+                     ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/scripts/init_db.py", line 12, in <module>
+    main()
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/scripts/init_db.py", line 7, in main
+    Base.metadata.create_all(bind=engine)
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/sql/schema.py", line 5868, in create_all
+    bind._run_ddl_visitor(
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 3253, in _run_ddl_visitor
+    conn._run_ddl_visitor(visitorcallable, element, **kwargs)
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2459, in _run_ddl_visitor
+    visitorcallable(self.dialect, self, **kwargs).traverse_single(element)
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/sql/visitors.py", line 664, in traverse_single
+    return meth(obj, **kw)
+           ^^^^^^^^^^^^^^^
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/sql/ddl.py", line 918, in visit_metadata
+    self.traverse_single(
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/sql/visitors.py", line 664, in traverse_single
+    return meth(obj, **kw)
+           ^^^^^^^^^^^^^^^
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/sql/ddl.py", line 956, in visit_table
+    )._invoke_with(self.connection)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/sql/ddl.py", line 314, in _invoke_with
+    return bind.execute(self)
+           ^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1418, in execute
+    return meth(
+           ^^^^^
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/sql/ddl.py", line 180, in _execute_on_connection
+    return connection._execute_ddl(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1529, in _execute_ddl
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.errors.InsufficientPrivilege) permission denied for schema public
+LINE 2: CREATE TABLE products (
+                     ^
+
+[SQL:
+CREATE TABLE products (
+        id SERIAL NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        price NUMERIC(10, 2) NOT NULL,
+        description TEXT,
+        rating INTEGER NOT NULL,
+        category VARCHAR(100),
+        product_url TEXT,
+        image_url TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+        PRIMARY KEY (id)
+)
+
+]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ psql -h localhost -U scraper_user -d scraper_db -c "\dt"
+Password for user scraper_user:
+Did not find any relations.
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ sudo -u postgres psql
+psql (16.13 (Ubuntu 16.13-0ubuntu0.24.04.1))
+Type "help" for help.
+
+postgres=# \c scraper_db
+You are now connected to database "scraper_db" as user "postgres".
+scraper_db=# GRANT ALL ON SCHEMA public TO scraper_user;
+ALTER SCHEMA public OWNER TO scraper_user;
+GRANT
+ALTER SCHEMA
+scraper_db=# \q
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ python -m scripts.init_db
+Creating database tables...
+2026-04-15 19:42:17,138 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2026-04-15 19:42:17,139 INFO sqlalchemy.engine.Engine [raw sql] {}
+2026-04-15 19:42:17,140 INFO sqlalchemy.engine.Engine select current_schema()
+2026-04-15 19:42:17,140 INFO sqlalchemy.engine.Engine [raw sql] {}
+2026-04-15 19:42:17,141 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2026-04-15 19:42:17,141 INFO sqlalchemy.engine.Engine [raw sql] {}
+2026-04-15 19:42:17,143 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-15 19:42:17,148 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace
+WHERE pg_catalog.pg_class.relname = %(table_name)s AND pg_catalog.pg_class.relkind = ANY (ARRAY[%(param_1)s, %(param_2)s, %(param_3)s, %(param_4)s, %(param_5)s]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != %(nspname_1)s
+2026-04-15 19:42:17,148 INFO sqlalchemy.engine.Engine [generated in 0.00020s] {'table_name': 'products', 'param_1': 'r', 'param_2': 'p', 'param_3': 'f', 'param_4': 'v', 'param_5': 'm', 'nspname_1': 'pg_catalog'}
+2026-04-15 19:42:17,151 INFO sqlalchemy.engine.Engine
+CREATE TABLE products (
+        id SERIAL NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        price NUMERIC(10, 2) NOT NULL,
+        description TEXT,
+        rating INTEGER NOT NULL,
+        category VARCHAR(100),
+        product_url TEXT,
+        image_url TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+        PRIMARY KEY (id)
+)
+
+
+2026-04-15 19:42:17,151 INFO sqlalchemy.engine.Engine [no key 0.00014s] {}
+2026-04-15 19:42:17,189 INFO sqlalchemy.engine.Engine CREATE INDEX ix_products_id ON products (id)
+2026-04-15 19:42:17,189 INFO sqlalchemy.engine.Engine [no key 0.00018s] {}
+2026-04-15 19:42:17,198 INFO sqlalchemy.engine.Engine COMMIT
+Done.
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ psql -h localhost -U scraper_user -d scraper_db -c "\dt"
+Password for user scraper_user:
+            List of relations
+ Schema |   Name   | Type  |    Owner
+--------+----------+-------+--------------
+ public | products | table | scraper_user
+(1 row)
+
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ cat > app/schemas.py << 'EOF'
+from datetime import datetime
+from decimal import Decimal
+from pydantic import BaseModel, ConfigDict
+
+
+class ProductBase(BaseModel):
+    name: str
+    price: Decimal
+    description: str | None = None
+    rating: int
+    category: str | None = None
+    product_url: str | None = None
+    image_url: str | None = None
+
+
+class ProductCreate(ProductBase):
+    pass
+
+
+class ProductResponse(ProductBase):
+    id: int
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+EOF
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ cat > app/crud.py << 'EOF'
+from sqlalchemy.orm import Session
+from app import models, schemas
+
+
+def get_all_products(db: Session):
+    return db.query(models.Product).order_by(models.Product.id.asc()).all()
+
+
+def get_product_by_id(db: Session, product_id: int):
+    return db.query(models.Product).filter(models.Product.id == product_id).first()
+
+
+def create_product(db: Session, product: schemas.ProductCreate):
+    db_product = models.Product(**product.model_dump())
+    db.add(db_product)
+    db.commit()
+    db.refresh(db_product)
+    return db_product
+EOF
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ cat > app/api.py << 'EOF'
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+
+from app.database import get_db
+from app import crud, schemas
+
+router = APIRouter()
+
+
+@router.get("/health")
+def health_check():
+    return {"status": "ok"}
+
+
+@router.get("/products", response_model=list[schemas.ProductResponse])
+def read_products(db: Session = Depends(get_db)):
+    return crud.get_all_products(db)
+
+
+@router.get("/products/{product_id}", response_model=schemas.ProductResponse)
+def read_product(product_id: int, db: Session = Depends(get_db)):
+    product = crud.get_product_by_id(db, product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return product
+
+
+@router.post("/products", response_model=schemas.ProductResponse)
+def add_product(product: schemas.ProductCreate, db: Session = Depends(get_db)):
+    return crud.create_product(db, product)
+EOF
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ cat > main.py << 'EOF'
+from fastapi import FastAPI
+from app.api import router
+
+app = FastAPI(
+    title="Scraper API Service",
+    description="A web scraping project exposed through FastAPI",
+    version="1.0.0"
+)
+
+app.include_router(router)
+EOF
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ uvicorn main:app --reload --host 0.0.0.0 --port 8000
+INFO:     Will watch for changes in these directories: ['/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [3329] using WatchFiles
+INFO:     Started server process [3331]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:54750 - "GET /health HTTP/1.1" 200 OK
+2026-04-15 19:46:32,747 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2026-04-15 19:46:32,748 INFO sqlalchemy.engine.Engine [raw sql] {}
+2026-04-15 19:46:32,750 INFO sqlalchemy.engine.Engine select current_schema()
+2026-04-15 19:46:32,750 INFO sqlalchemy.engine.Engine [raw sql] {}
+2026-04-15 19:46:32,751 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2026-04-15 19:46:32,751 INFO sqlalchemy.engine.Engine [raw sql] {}
+2026-04-15 19:46:32,751 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-15 19:46:32,755 INFO sqlalchemy.engine.Engine SELECT products.id AS products_id, products.name AS products_name, products.price AS products_price, products.description AS products_description, products.rating AS products_rating, products.category AS products_category, products.product_url AS products_product_url, products.image_url AS products_image_url, products.created_at AS products_created_at
+FROM products ORDER BY products.id ASC
+2026-04-15 19:46:32,755 INFO sqlalchemy.engine.Engine [generated in 0.00022s] {}
+2026-04-15 19:46:32,764 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:54766 - "GET /products HTTP/1.1" 200 OK
+2026-04-15 19:46:45,652 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-15 19:46:45,652 INFO sqlalchemy.engine.Engine SELECT products.id AS products_id, products.name AS products_name, products.price AS products_price, products.description AS products_description, products.rating AS products_rating, products.category AS products_category, products.product_url AS products_product_url, products.image_url AS products_image_url, products.created_at AS products_created_at
+FROM products ORDER BY products.id ASC
+2026-04-15 19:46:45,653 INFO sqlalchemy.engine.Engine [cached since 12.9s ago] {}
+2026-04-15 19:46:45,655 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:38388 - "GET /products HTTP/1.1" 200 OK
+2026-04-15 19:47:07,151 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-15 19:47:07,151 INFO sqlalchemy.engine.Engine SELECT products.id AS products_id, products.name AS products_name, products.price AS products_price, products.description AS products_description, products.rating AS products_rating, products.category AS products_category, products.product_url AS products_product_url, products.image_url AS products_image_url, products.created_at AS products_created_at
+FROM products ORDER BY products.id ASC
+2026-04-15 19:47:07,151 INFO sqlalchemy.engine.Engine [cached since 33.63s ago] {}
+2026-04-15 19:47:07,153 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:48540 - "GET /products HTTP/1.1" 200 OK
+2026-04-15 19:48:33,328 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-15 19:48:33,331 INFO sqlalchemy.engine.Engine INSERT INTO products (name, price, description, rating, category, product_url, image_url) VALUES (%(name)s, %(price)s, %(description)s, %(rating)s, %(category)s, %(product_url)s, %(image_url)s) RETURNING products.id, products.created_at
+2026-04-15 19:48:33,331 INFO sqlalchemy.engine.Engine [generated in 0.00028s] {'name': 'Test Laptop', 'price': Decimal('999.99'), 'description': 'Sample product for API testing', 'rating': 4, 'category': 'Laptops', 'product_url': 'https://example.com/product/test-laptop', 'image_url': 'https://example.com/images/test-laptop.jpg'}
+2026-04-15 19:48:33,335 INFO sqlalchemy.engine.Engine COMMIT
+2026-04-15 19:48:33,343 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-15 19:48:33,345 INFO sqlalchemy.engine.Engine SELECT products.id, products.name, products.price, products.description, products.rating, products.category, products.product_url, products.image_url, products.created_at
+FROM products
+WHERE products.id = %(pk_1)s
+2026-04-15 19:48:33,345 INFO sqlalchemy.engine.Engine [generated in 0.00028s] {'pk_1': 1}
+2026-04-15 19:48:33,348 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:35834 - "POST /products HTTP/1.1" 200 OK
+2026-04-15 19:48:43,866 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-15 19:48:43,867 INFO sqlalchemy.engine.Engine SELECT products.id AS products_id, products.name AS products_name, products.price AS products_price, products.description AS products_description, products.rating AS products_rating, products.category AS products_category, products.product_url AS products_product_url, products.image_url AS products_image_url, products.created_at AS products_created_at
+FROM products ORDER BY products.id ASC
+2026-04-15 19:48:43,867 INFO sqlalchemy.engine.Engine [cached since 128s ago] {}
+2026-04-15 19:48:43,868 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:48924 - "GET /products HTTP/1.1" 200 OK
+^CINFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [3331]
+INFO:     Stopping reloader process [3329]
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$ uvicorn main:app --reload --host 0.0.0.0 --port 8000
+INFO:     Will watch for changes in these directories: ['/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [3707] using WatchFiles
+INFO:     Started server process [3709]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+2026-04-15 20:28:04,766 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2026-04-15 20:28:04,767 INFO sqlalchemy.engine.Engine [raw sql] {}
+2026-04-15 20:28:04,770 INFO sqlalchemy.engine.Engine select current_schema()
+2026-04-15 20:28:04,770 INFO sqlalchemy.engine.Engine [raw sql] {}
+2026-04-15 20:28:04,773 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2026-04-15 20:28:04,774 INFO sqlalchemy.engine.Engine [raw sql] {}
+2026-04-15 20:28:04,776 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-15 20:28:04,778 INFO sqlalchemy.engine.Engine DELETE FROM products
+2026-04-15 20:28:04,778 INFO sqlalchemy.engine.Engine [generated in 0.00013s] {}
+2026-04-15 20:28:04,782 INFO sqlalchemy.engine.Engine COMMIT
+2026-04-15 20:28:04,799 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-15 20:28:04,804 INFO sqlalchemy.engine.Engine INSERT INTO products (name, price, description, rating, category, product_url, image_url) SELECT p0::VARCHAR, p1::NUMERIC(10, 2), p2::TEXT, p3::INTEGER, p4::VARCHAR, p5::TEXT, p6::TEXT FROM (VALUES (%(name__0)s, %(price__0)s, %(description__0)s, %(ra ... 717 characters truncated ... , sen_counter) ORDER BY sen_counter RETURNING products.id, products.created_at, products.id AS id__1
+2026-04-15 20:28:04,805 INFO sqlalchemy.engine.Engine [generated in 0.00041s (insertmanyvalues) 1/1 (ordered)] {'description__0': '15.6", AMD E2-3800 1.3GHz, 4GB, 500GB, Windows 8.1', 'price__0': Decimal('416.99'), 'category__0': 'laptops', 'name__0': 'Packard 255 G2', 'image_url__0': 'https://webscraper.io/images/test-sites/e-commerce/items/cart2.png', 'rating__0': 2, 'product_url__0': 'https://webscraper.io/test-sites/e-commerce/static/product/31', 'description__1': '15.6", Pentium N3520 2.16GHz, 4GB, 500GB, Linux', 'price__1': Decimal('306.99'), 'category__1': 'laptops', 'name__1': 'Aspire E1-510', 'image_url__1': 'https://webscraper.io/images/test-sites/e-commerce/items/cart2.png', 'rating__1': 3, 'product_url__1': 'https://webscraper.io/test-sites/e-commerce/static/product/32', 'description__2': '15.6", Core i5-4200M, 4GB, 500GB, Win7 Pro 64bit', 'price__2': Decimal('1178.99'), 'category__2': 'laptops', 'name__2': 'ThinkPad T540p', 'image_url__2': 'https://webscraper.io/images/test-sites/e-commerce/items/cart2.png', 'rating__2': 1, 'product_url__2': 'https://webscraper.io/test-sites/e-commerce/static/product/33', 'description__3': '14", Core i5 2.6GHz, 4GB, 500GB, Win7 Pro 64bit', 'price__3': Decimal('739.99'), 'category__3': 'laptops', 'name__3': 'ProBook', 'image_url__3': 'https://webscraper.io/images/test-sites/e-commerce/items/cart2.png', 'rating__3': 4, 'product_url__3': 'https://webscraper.io/test-sites/e-commerce/static/product/34', 'description__4': '12.5", Core i5-4300U, 8GB, 240GB SSD, Win7 Pro 64bit', 'price__4': Decimal('1311.99'), 'category__4': 'laptops', 'name__4': 'ThinkPad X240', 'image_url__4': 'https://webscraper.io/images/test-sites/e-commerce/items/cart2.png', 'rating__4': 3, 'product_url__4': 'https://webscraper.io/test-sites/e-commerce/static/product/35', 'description__5': '15.6", Core i5-4200U, 8GB, 1TB, Radeon R7 M265, Windows 8.1', 'price__5': Decimal('581.99'), 'category__5': 'laptops', 'name__5': 'Aspire E1-572G', 'image_url__5': 'https://webscraper.io/images/test-sites/e-commerce/items/cart2.png', 'rating__5': 1, 'product_url__5': 'https://webscraper.io/test-sites/e-commerce/static/product/36'}
+2026-04-15 20:28:04,809 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     127.0.0.1:39648 - "POST /scrape HTTP/1.1" 200 OK
+2026-04-15 20:28:20,568 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-15 20:28:20,571 INFO sqlalchemy.engine.Engine SELECT products.id AS products_id, products.name AS products_name, products.price AS products_price, products.description AS products_description, products.rating AS products_rating, products.category AS products_category, products.product_url AS products_product_url, products.image_url AS products_image_url, products.created_at AS products_created_at
+FROM products ORDER BY products.id ASC
+2026-04-15 20:28:20,571 INFO sqlalchemy.engine.Engine [generated in 0.00023s] {}
+2026-04-15 20:28:20,574 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:44616 - "GET /products HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'app/crud.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [3709]
+INFO:     Started server process [3791]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'app/api.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [3791]
+INFO:     Started server process [3793]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+^CINFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [3793]
+INFO:     Stopping reloader process [3707]
+(.venv) amran@Surface:/mnt/c/Data enginering/A1-Data-Engineering-Bootcamp/Week-05-Scraper-API-Service/Project-Scraper-API-Service$

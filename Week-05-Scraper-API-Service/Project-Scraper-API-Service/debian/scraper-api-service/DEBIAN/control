@@ -1,0 +1,11 @@
+Package: scraper-api-service
+Version: 1.0.0-1
+Architecture: all
+Maintainer: amran <amran@example.com>
+Installed-Size: 37
+Depends: python3, python3-venv, postgresql, ufw
+Section: python
+Priority: optional
+Description: Scraper API Service
+ FastAPI-based scraping service that collects product data,
+ stores it in PostgreSQL, and runs as a systemd service.

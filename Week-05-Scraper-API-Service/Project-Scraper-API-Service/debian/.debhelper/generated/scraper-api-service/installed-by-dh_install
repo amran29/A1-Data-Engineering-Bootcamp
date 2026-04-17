@@ -1,0 +1,6 @@
+./app
+./scripts
+./main.py
+./requirements.txt
+./README.md
+./systemd/scraper-api.service

@@ -1,0 +1,16 @@
+18e3bbca33e16ea7757c2fa1e8cce610  lib/systemd/system/scraper-api.service
+6b28a6b25839dc14473c81f265cb67b4  opt/scraper-api-service/README.md
+d41d8cd98f00b204e9800998ecf8427e  opt/scraper-api-service/app/__init__.py
+67f6324fc4ea93c9721ef9e459f86a8f  opt/scraper-api-service/app/api.py
+20b6842962a8fb3fd0a49620aa727221  opt/scraper-api-service/app/cleaner.py
+cfd8442dea4b30b87078898d6f1106f2  opt/scraper-api-service/app/config.py
+c5cea1b2c319c1bcad6d29eee0f4fb00  opt/scraper-api-service/app/crud.py
+51171d537557996c45ecbfbeb53ef9b2  opt/scraper-api-service/app/database.py
+ba812b7072aa90be1dd4d15ccea62318  opt/scraper-api-service/app/models.py
+65aec021070bd609b3e3cae104105f96  opt/scraper-api-service/app/schemas.py
+e5881d5138c3988ba0a4dc899323417f  opt/scraper-api-service/app/scraper.py
+7327c2cb1989111a95b7d861e8435025  opt/scraper-api-service/main.py
+4c1ccc6bcf85533cf614c7f93b2dbacd  opt/scraper-api-service/requirements.txt
+a7cfdf371a39eb39caa7cef59da327a4  opt/scraper-api-service/scripts/init_db.py
+86fe27267cedcc8febd928f3e896c665  opt/scraper-api-service/scripts/run_scraper.py
+6516ca0d6c59676d10caa1f32a580ba0  usr/share/doc/scraper-api-service/changelog.Debian.gz

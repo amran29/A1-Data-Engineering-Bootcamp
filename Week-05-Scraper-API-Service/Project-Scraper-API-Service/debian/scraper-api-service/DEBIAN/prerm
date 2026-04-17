@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+
+systemctl stop scraper-api.service || true
+systemctl disable scraper-api.service || true
+
+exit 0
