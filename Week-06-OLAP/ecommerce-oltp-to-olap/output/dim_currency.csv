@@ -1,0 +1,4 @@
+currency_key,currency_id,currency_code,currency_name,exchange_rate_to_sar,created_at
+1,1,SAR,Saudi Riyal,1.0,2026-04-20 20:45:24.296077
+2,2,USD,US Dollar,3.75,2026-04-20 20:45:24.296077
+3,3,AED,UAE Dirham,1.02,2026-04-20 20:45:24.296077

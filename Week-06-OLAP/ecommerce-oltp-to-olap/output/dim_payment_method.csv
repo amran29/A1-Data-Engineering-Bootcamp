@@ -1,0 +1,6 @@
+payment_method_key,method_id,method_name,is_active
+1,1,Credit Card,True
+2,2,Mada,True
+3,3,Apple Pay,True
+4,4,Cash on Delivery,True
+5,5,STC Pay,True
