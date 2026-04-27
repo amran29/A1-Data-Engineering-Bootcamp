@@ -1,0 +1,3 @@
+book_id,title,author_name,publisher_name,language,price
+1,Data Engineering Basics,John Smith,Tech Books,English,25.0
+2,SQL for Beginners,Emily Brown,Data Press,English,18.5
