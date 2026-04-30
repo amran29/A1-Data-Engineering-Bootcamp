@@ -1,4 +1,0 @@
-.env
-data/raw/olist.sqlite
-__pycache__/
-*.pyc
