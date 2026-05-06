@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # 1. Hadoop Environment (HDFS & YARN)
+  hdfs_cluster:
+    image: itversity/itvdelab:latest
+    container_name: hdfs_lab
+    # Ports disabled to avoid Windows conflicts. NiFi connects internally.
+    # ports:
+    #   - "9871:9870" 
+    #   - "8088:8088"
+    networks:
+      - data_network
+
+  # 2. PostgreSQL Database
+  postgres_db:
+    image: postgres:13
+    container_name: postgres_lab
+    env_file:
+      - .env  # Loading variables from the .env file
+    ports:
+      - "5432:5432"
+    volumes:
+      # Auto-execute the SQL script when the database starts for the first time
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - data_network
+
+  # 3. Apache NiFi Server
+  nifi_server:
+    image: apache/nifi:latest
+    container_name: nifi_lab
+    ports:
+      - "8443:8443" 
+    environment:
+      - SINGLE_USER_CREDENTIALS_USERNAME=${NIFI_USER}
+      - SINGLE_USER_CREDENTIALS_PASSWORD=${NIFI_PASSWORD}
+    volumes:
+      - ./nifi_input_data:/opt/nifi_input_data 
+    depends_on:
+      - postgres_db
+      - hdfs_cluster
+    networks:
+      - data_network
+
+networks:
+  data_network:
+    driver: bridge

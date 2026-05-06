@@ -1,0 +1,27 @@
+services:
+  # خدمة قاعدة بيانات PostgreSQL لـ Hive Metastore
+  cluster_util_db:
+    image: postgres:13
+    container_name: hive_metastore_db
+    environment:
+      - POSTGRES_USER=hive
+      - POSTGRES_PASSWORD=itversity
+      - POSTGRES_DB=metastore
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  # خدمة بيئة Hive و Hadoop
+  hive_env:
+    image: ${ITVERSITY_IMAGE}
+    container_name: hive_scd2_env
+    ports:
+      - "${HIVE_PORT}:10000"
+      - "${JUPYTER_PORT}:8888"
+    volumes:
+      - ./data:/workspace/data
+      - ./scripts:/workspace/scripts
+    depends_on:
+      - cluster_util_db
+    tty: true
+    restart: unless-stopped
