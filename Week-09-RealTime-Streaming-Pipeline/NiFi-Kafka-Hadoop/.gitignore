@@ -1,7 +1,6 @@
 # === 1. Docker & Infrastructure ===
 .examples_env
 
-docker/hadoop_conf/
 docker/nifi_data/
 docker/kafka_data/
 
