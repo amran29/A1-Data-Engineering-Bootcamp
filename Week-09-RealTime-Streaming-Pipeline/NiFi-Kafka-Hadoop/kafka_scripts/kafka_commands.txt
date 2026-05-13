@@ -1,0 +1,31 @@
+====================================================================
+KAFKA COMMANDS AND CONFIGURATION
+Project: Real-Time Data Engineering Pipeline
+====================================================================
+
+## 1. Topic Creation Commands
+# Command used to create the required topic inside the Kafka Docker container:
+docker exec kafka kafka-topics --create --topic ecommerce-transactions --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+
+# Command used to verify the topic was created successfully:
+docker exec kafka kafka-topics --list --bootstrap-server localhost:9092
+
+
+## 2. Producer Configuration (NiFi - PublishKafka_2_6 Processor)
+# These settings were applied to publish JSON data to Kafka:
+- Kafka Brokers      : kafka:29092 
+  *(Note: Used internal Docker network alias 'kafka' and port '29092' to resolve DNS/Timeout issues)*
+- Topic Name         : ecommerce-transactions
+- Delivery Guarantee : 1 (Best Effort) 
+  *(Note: Changed from 'All' to '1' to optimize throughput and break TimeoutException loops in Docker)*
+- Request Timeout    : 1 min
+- Use Transactions   : false
+- Message Demarcator : Shift-JIS (Empty)
+
+
+## 3. Consumer Configuration (NiFi - ConsumeKafka_2_6 Processor)
+# These settings were applied to consume messages from Kafka and push them to HDFS:
+- Kafka Brokers      : kafka:29092
+- Topic Name         : ecommerce-transactions
+- Group ID           : nifi-hdfs-consumer-group
+- Offset Reset       : earliest

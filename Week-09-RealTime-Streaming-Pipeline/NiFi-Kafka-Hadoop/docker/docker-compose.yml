@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # 1. Zookeeper
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.2
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - pipeline_net
+
+  # 2. Apache Kafka
+  kafka:
+    image: confluentinc/cp-kafka:7.3.2
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "${KAFKA_PORT}:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - pipeline_net
+
+  # 3. Kafka UI
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "${KAFKA_UI_PORT}:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local_cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+    depends_on:
+      - kafka
+    networks:
+      - pipeline_net
+
+  # 4. Hadoop / HDFS (بيئة itversity)
+  hdfs_lab:
+    image: itversity/itvdelab:latest
+    container_name: hdfs_lab
+    hostname: hdfs_lab
+    # Ports disabled as per your previous successful setup to avoid Windows conflicts
+    networks:
+      - pipeline_net
+    tty: true
+
+  # 5. Apache NiFi
+  nifi_lab:
+    image: apache/nifi:1.23.2  # تغيير النسخة إلى واحدة مستقرة جداً ومعروفة بمعالجاتها
+    container_name: nifi_lab
+    ports:
+      - "${NIFI_HTTPS_PORT}:8443"
+    environment:
+      - SINGLE_USER_CREDENTIALS_USERNAME=${NIFI_USER}
+      - SINGLE_USER_CREDENTIALS_PASSWORD=${NIFI_PASSWORD}
+      # زيادة الذاكرة المخصصة للجافا داخل NiFi
+      - NIFI_JVM_HEAP_INIT=1g
+      - NIFI_JVM_HEAP_MAX=2g
+    volumes:
+      - ../src/streaming_generator/data:/opt/nifi/nifi-current/in_data 
+      - ./hadoop_conf:/opt/nifi/nifi-current/hadoop_conf 
+    networks:
+      - pipeline_net
+
+networks:
+  pipeline_net:
+    driver: bridge

@@ -1,0 +1,28 @@
+# === 1. Docker & Infrastructure ===
+.examples_env
+
+docker/hadoop_conf/
+docker/nifi_data/
+docker/kafka_data/
+
+
+# === 2. Python & Environment ===
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+
+
+# === 3. Data & Temporary Files ===
+src/streaming_generator/data/*.csv
+
+*.log
+.DS_Store
+Thumbs.db
+
+
+# === 4. NiFi Backups ===
+nifi_pipeline/*.gz
+nifi_pipeline/*.xml
