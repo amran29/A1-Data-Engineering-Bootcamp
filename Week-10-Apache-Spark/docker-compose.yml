@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  spark-lab:
+    image: itversity/itvdelab:latest
+    container_name: spark_rdd_container
+    ports:
+      - "8888:8888"  # منفذ Jupyter Notebook
+      - "4040:4040"  # منفذ Spark Web UI لمراقبة تنفيذ العمليات
+    volumes:
+      # ربط المجلد الحالي بجهازك بمجلد العمل داخل الحاوية
+      - .:/data/spark-assignments
+    working_dir: /data/spark-assignments
+    restart: always
