@@ -1,0 +1,6 @@
+v1
+{"path":"file:///data/spark-assignments/lab2_temperature/json_input_dir/batch1.json","timestamp":1777825415605,"batchId":0}
+{"path":"file:///data/spark-assignments/lab2_temperature/json_input_dir/batch2.json","timestamp":1777825495667,"batchId":0}
+{"path":"file:///data/spark-assignments/lab2_temperature/json_input_dir/batch3.json","timestamp":1777825498088,"batchId":0}
+{"path":"file:///data/spark-assignments/lab2_temperature/json_input_dir/batch4.json","timestamp":1777825500250,"batchId":0}
+{"path":"file:///data/spark-assignments/lab2_temperature/json_input_dir/batch5.json","timestamp":1777825502420,"batchId":0}

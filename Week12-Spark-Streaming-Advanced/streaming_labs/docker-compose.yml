@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  spark-streaming-lab:
+    image: itversity/itvdelab:latest
+    container_name: spark_streaming_container
+    ports:
+      - "8888:8888"  # منفذ Jupyter Notebook الرئيسي لتشغيل ملفات .ipynb
+      - "4040:4040"  # منفذ Spark Web UI لمراقبة الـ Streaming Batches الحالية
+      - "4041:4041"  # منفذ احتياطي للـ Spark UI في حال تشغيل نوتبوك آخر بالتوازي
+    volumes:
+      # ربط مجلد streaming_labs الحالي بجهازك بمجلد العمل داخل الحاوية للحفاظ على ملفاتك للـ Git
+      - .:/data/spark-assignments
+    working_dir: /data/spark-assignments
+    restart: always
+
+#docker logs spark_streaming_container

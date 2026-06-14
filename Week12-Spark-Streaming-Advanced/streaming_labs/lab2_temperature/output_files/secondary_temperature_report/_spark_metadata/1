@@ -1,0 +1,3 @@
+v1
+{"path":"file:///data/spark-assignments/lab2_temperature/output_files/secondary_temperature_report/part-00000-a5dcfa40-3901-4015-9798-dee4fc3462ff-c000.snappy.parquet","size":1970,"isDir":false,"modificationTime":1781373938453,"blockReplication":1,"blockSize":33554432,"action":"add"}
+{"path":"file:///data/spark-assignments/lab2_temperature/output_files/secondary_temperature_report/part-00001-21750b35-4895-4009-a84b-636f60c897c9-c000.snappy.parquet","size":1805,"isDir":false,"modificationTime":1781373938585,"blockReplication":1,"blockSize":33554432,"action":"add"}
